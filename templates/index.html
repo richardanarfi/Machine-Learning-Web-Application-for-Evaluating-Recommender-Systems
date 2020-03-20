@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Index{% endblock %}
+
+{% block content %}
+	<body style="background-color:#F0F8FF;">
+	<canvas id="homepage" width="1080" height="550" style="border:1px solid #F0F8FF;">
+		Your browser does not support the HTML5 canvas tag.
+		</canvas>
+		<script>
+		var c = document.getElementById("homepage");
+		var ctx = c.getContext("2d");
+
+		// Create gradient
+		var grd = ctx.createLinearGradient(1070,530,0,0);
+		grd.addColorStop(0,"LightSlateGray");
+		grd.addColorStop(1,"SlateGrey");
+
+		// Fill with gradient
+		ctx.fillStyle = grd;
+		ctx.fillRect(10,10,1070,530);
+		</script>
+		
+		<script>
+		var c = document.getElementById("homepage");
+		var ctx = c.getContext("2d");
+		ctx.font = "33px Garamond";
+		ctx.fillStyle = "snow";
+		// ctx.textAlign = "center";
+		// ctx.fillText("Hello World", canvas.width/2, canvas.height/2);
+		ctx.strokeText("This is the awesome homepage of the Web Application for Evaluating",80,150);
+		ctx.strokeText("Recommender Systems Machine Learning CS 682 Project",130,200);
+		ctx.fillText("Please Log In or Sign up to continue",280,350);
+		
+		</script>
+	</body>
+{% endblock %}
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js">
+</script>
+<nav class="navbar navbar-inverse">
+<div class="container-fluid">
+<div class="navbar-header">
+<a class="navbar-brand" href="{% url 'index' %}">
+
+</a>
+
+
+</div>
+
+
+
+
+</nav>

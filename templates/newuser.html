@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+  <body>        
+    <style>
+			
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+      form{
+      border: 1px solid #2c3539;
+	  width: 50%;
+      }
+      input[type=text], input[type=password] {
+      width: 100%;
+      padding: 8px 8px;
+      margin: 8px 200;
+      display: inline-block;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      }
+      button {
+      background-color: #8ebf42;
+      color: white;
+      padding: 14px 0;
+      margin: 10px 0;
+      border: none;
+      width: 100%;
+      }
+      h1 {
+      text-align:center;
+      fone-size:18;
+      }
+      button:hover {
+      opacity: 0.8;
+      }
+      .formcontainer {
+      text-align: left;
+      margin: 0px 25px 12px;
+	  width: 100%;
+      }
+      .container {
+      padding: 16px 0;
+      text-align:left;
+	  width: 35%;
+      }
+      span.psw {
+      float: right;
+      padding-top: 0;
+      padding-right: 15px;
+	  width: 50%;
+      }
+      
+    </style>  
+  
+  	<div class="formcontainer">
+      <form method="post">
+            
+	  <h1>Sign up</h1>
+      <hr/>
+	    {% csrf_token %}
+        {{ form.as_p }}	    
+       <button type="submit" style="background-color: #000">Register</button>      
+      </form>
+	</div>
+  </body>
+{% endblock %}

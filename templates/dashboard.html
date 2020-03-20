@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+
+	<body style="background-color:#F0F8FF;">
+
+		<h2> Please make a selection from the options below:</h2>
+
+		<canvas id="MF_Canvas" width="360" height="550" style="border:1px solid #F0F8FF;">
+		Your browser does not support the HTML5 canvas tag.
+		</canvas>
+		<canvas id="NN_Canvas" width="360" height="550" style="border:1px solid #F0F8FF;">
+		Your browser does not support the HTML5 canvas tag.
+		</canvas>
+		<canvas id="SP_Canvas" width="360" height="550" style="border:1px solid #F0F8FF;">
+		Your browser does not support the HTML5 canvas tag.
+		</canvas>
+
+
+		<script>
+		var c = document.getElementById("MF_Canvas");
+		var ctx = c.getContext("2d");
+
+		// Create gradient
+		var grd = ctx.createLinearGradient(340,530,0,0);
+		grd.addColorStop(0,"DarkRed");
+		grd.addColorStop(1,"white");
+
+		// Fill with gradient
+		ctx.fillStyle = grd;
+		ctx.fillRect(10,10,340,530);
+		</script>
+
+		<script>
+		var c = document.getElementById("NN_Canvas");
+		var ctx = c.getContext("2d");
+
+		// Create gradient
+		var grd = ctx.createLinearGradient(340,530,0,0);
+		grd.addColorStop(0,"teal");
+		grd.addColorStop(1,"white");
+
+		// Fill with gradient
+		ctx.fillStyle = grd;
+		ctx.fillRect(10,10,340,530);
+		</script>
+
+		<script>
+		var c = document.getElementById("SP_Canvas");
+		var ctx = c.getContext("2d");
+
+		// Create gradient
+		var grd = ctx.createLinearGradient(340,530,0,0);
+		grd.addColorStop(0,"coral");
+		grd.addColorStop(1,"white");
+
+		// Fill with gradient
+		ctx.fillStyle = grd;
+		ctx.fillRect(10,10,340,530);
+		</script>
+
+		<script>
+		var c = document.getElementById("MF_Canvas");
+		var ctx = c.getContext("2d");
+		ctx.font = "40px Arial";
+		ctx.strokeText("Matrix",120,250);
+		ctx.strokeText("Factorization",60,300);
+		</script>
+
+		<script>
+		var c = document.getElementById("NN_Canvas");
+		var ctx = c.getContext("2d");
+		ctx.font = "40px Arial";
+		ctx.strokeText("Neural",110,250);
+		ctx.strokeText("Network",90,300);
+		</script>
+
+		<script>
+		var c = document.getElementById("SP_Canvas");
+		var ctx = c.getContext("2d");
+		ctx.font = "40px Arial";
+		ctx.strokeText("Scratch",110,250);
+		ctx.strokeText("Pad",140,300);
+		</script>
+
+	</body>
+
+{% else %}
+  <p>You are not authorized to view this page.</p>
+  <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}
