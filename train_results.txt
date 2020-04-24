@@ -1,0 +1,16 @@
+fitting model....
+
+Epoch 0	Step 1	lr: 0.001000	loss: 0.996112
+Epoch 1	Step 500	lr: 0.001000	loss: 0.993776
+Epoch 2	Step 1000	lr: 0.001000	loss: 0.976033
+Epoch 3	Step 1500	lr: 0.001000	loss: 0.962262
+Epoch 4	Step 2000	lr: 0.001000	loss: 0.950471
+Epoch 5	Step 2500	lr: 0.001000	loss: 0.942907
+Epoch 6	Step 3000	lr: 0.001000	loss: 0.936497
+Epoch 7	Step 3500	lr: 0.001000	loss: 0.931090
+Epoch 8	Step 4000	lr: 0.001000	loss: 0.927322
+Epoch 9	Step 4500	lr: 0.001000	loss: 0.923436
+Epoch 11	Step 5000	lr: 0.001000	loss: 0.923583
+Epoch 12	Step 5500	lr: 0.001000	loss: 0.910794
+Epoch 13	Step 6000	lr: 0.001000	loss: 0.909588
+Epoch 14	Step 6500	lr: 0.001000	loss: 0.907838

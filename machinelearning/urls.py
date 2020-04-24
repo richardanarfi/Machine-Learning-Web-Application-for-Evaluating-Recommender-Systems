@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
+#from pages import views as vw
+from django.conf.urls import url
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +29,6 @@ urlpatterns = [
 	path('neural_network/', TemplateView.as_view(template_name='NN.html'), name='Neural_Network'),
 	path('scratch_pad/', TemplateView.as_view(template_name='SP.html'), name='Scratch_Pad'),
 	path('', TemplateView.as_view(template_name='index.html'), name='index'),
+	url(r'^NN_model/', views.NN_model),
+	url(r'^matrixFactorization', views.matrixFactorization),
 ]
