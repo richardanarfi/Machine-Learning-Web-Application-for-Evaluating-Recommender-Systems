@@ -6,9 +6,23 @@ from django.http import HttpResponse
 from matplotlib import pylab
 from pylab import *
 import PIL, PIL.Image, io as StringIO
-import csv
 import re
 import mimetypes
+
+
+def ContentBased(request):
+    print(request.POST)
+    input1 = request.POST.get('movie_title')
+    print(input1)
+    #input1 = "ratings100k.dat"
+    #input2 = "0.7"
+    #input3 = "20"
+    #input4 = "10"
+    #out= run([sys.executable,'//cf.py',inp],shell=False,stdout=PIPE)
+    run([sys.executable,"machinelearning/cf2.py",input1],shell=False,stdout=PIPE)
+    #print(out)
+    file = open("machinelearning/file.txt","r").readlines()
+    return render(request,'CF.html',{'data':file})
 
 
 def NN_model(request):
