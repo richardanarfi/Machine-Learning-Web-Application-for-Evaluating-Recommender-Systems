@@ -13,14 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from django.views.generic.base import TemplateView
-#from pages import views as vw
-from django.conf.urls import url
-from . import views
+from django.conf import settings
+# from pages import views as vw
 # from pages import views as vw
 from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
@@ -33,11 +30,13 @@ urlpatterns = [
     path('users/', include('django.contrib.auth.urls')),
 	path('dashboard/', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
 	path('matrix_factorization/', TemplateView.as_view(template_name='MF.html'), name='Matrix_Factorization'),
-	path('content_based/', TemplateView.as_view(template_name='CF.html'), name='Content_Based'),
 	path('neural_network/', TemplateView.as_view(template_name='NN.html'), name='Neural_Network'),
 	path('scratch_pad/', TemplateView.as_view(template_name='SP.html'), name='Scratch_Pad'),
 	path('', TemplateView.as_view(template_name='index.html'), name='index'),
 	url(r'^NN_model/', views.NN_model),
 	url(r'^matrixFactorization', views.matrixFactorization),
-	url(r'^ContentBased', views.ContentBased),
-]
+
+
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

@@ -3,6 +3,7 @@
 {% block title %}Matrix Factorization{% endblock %}
 
 {% block content %}
+{% load static %} <!-- New line -->
 
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -70,18 +71,20 @@ div.b {
 
 </style>
 </head>
-<body>
 
 <div class="split left">
 <div class="formcontainer">
 <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-  
   <h1 href="{% url 'Matrix_Factorization' %}" class="btn btn-outline-secondary">
             Matrix Factorization</h1>
 </nav>
 <br>
-<div class="row align-items-center">
-	
+<div class="container">
+      <div class="overlay">Ratings Distribution</div>
+   <img src="{% static "test1.png" %}" alt="Data Distribution Plot by Movie Ratings" width="400" height="400"/>
+</div>
+
+
     <div class="col-sm">
       <form action="/matrixFactorization/" method="post">
 	      {% csrf_token %}
