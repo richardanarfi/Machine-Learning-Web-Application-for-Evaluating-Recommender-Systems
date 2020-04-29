@@ -16,7 +16,8 @@ random.seed(0)
 class UserBasedCF:
     ''' TopN recommendation - User Based Collaborative Filtering '''
 
-    def __init__(self, n_sim_user=20, n_rec_movie=10):
+
+    def __init__(self, n_sim_user = 20, n_rec_movie = 10):
         self.trainset = {}
         self.testset = {}
 
@@ -27,9 +28,9 @@ class UserBasedCF:
         self.movie_popular = {}
         self.movie_count = 0
 
-        print('Number of similar users to consider = %d' % self.n_sim_user, file=outfile)
-        print('Number of movies to recommend = %d\n' %
-              self.n_rec_movie, file=outfile)
+        print ('Number of similar users to consider = %d' % self.n_sim_user, file=outfile)
+        print ('Number of movies to recommend = %d\n' %
+               self.n_rec_movie, file=outfile)
 
     @staticmethod
     def loadfile(filename):
@@ -38,9 +39,9 @@ class UserBasedCF:
         for i, line in enumerate(fp):
             yield line.strip('\r\n')
             if i % 100000 == 0:
-                print('loading %s(%s)' % (filename, i), file=outfile)
+                print ('loading %s(%s)')
         fp.close()
-        print('loaded %s succussfully' % filename, file=outfile)
+        print ('loaded %s succussfully')
 
     def generate_dataset(self, filename, pivot=0.7):
         ''' load rating data and split it to training set and test set '''
@@ -59,15 +60,15 @@ class UserBasedCF:
                 self.testset[user][movie] = int(rating)
                 testset_len += 1
 
-        print('\ndone splitting training and test set', file=outfile)
-        print('train set = %s' % trainset_len, file=outfile)
-        print('test set = %s' % testset_len, file=outfile)
+        print ('\ndone splitting training and test set')
+        print ('train set = %s' % trainset_len, file=outfile)
+        print ('test set = %s' % testset_len, file=outfile)
 
     def calc_user_sim(self):
         ''' calculate user similarity matrix '''
         # build inverse table for item-users
         # key=movieID, value=list of userIDs who have seen this movie
-        print('\nbuilding movie-users inverse table...', file=outfile)
+        print ('\nbuilding movie-users inverse table...')
         movie2users = dict()
 
         for user, movies in self.trainset.items():
@@ -80,15 +81,15 @@ class UserBasedCF:
                 if movie not in self.movie_popular:
                     self.movie_popular[movie] = 0
                 self.movie_popular[movie] += 1
-        print('movie-users inverse table succussfully built', file=outfile)
+        print ('movie-users inverse table succussfully built')
 
         # save the total movie number, which will be used in evaluation
         self.movie_count = len(movie2users)
-        print('\ntotal movie number = %d' % self.movie_count, file=outfile)
+        print ('\ntotal movie number = %d' % self.movie_count, file=outfile)
 
         # count co-rated items between users
         usersim_mat = self.user_sim_mat
-        print('\nbuilding user co-rated movies matrix...', file=outfile)
+        print ('\nbuilding user co-rated movies matrix...')
 
         for movie, users in movie2users.items():
             for u in users:
@@ -97,10 +98,10 @@ class UserBasedCF:
                     if u == v:
                         continue
                     usersim_mat[u][v] += 1
-        print('co-rated movies matrix succussfully built!', file=outfile)
+        print ('co-rated movies matrix succussfully built!')
 
         # calculate similarity matrix
-        print('\ncalculating user similarity matrix...', file=outfile)
+        print ('\ncalculating user similarity matrix...')
         simfactor_count = 0
         PRINT_STEP = 2000000
 
@@ -110,13 +111,13 @@ class UserBasedCF:
                     len(self.trainset[u]) * len(self.trainset[v]))
                 simfactor_count += 1
                 if simfactor_count % PRINT_STEP == 0:
-                    print('calculating user similarity factor(%d)' %
-                          simfactor_count, file=outfile)
+                    print ('calculating user similarity factor(%d)' %
+                           simfactor_count, file=outfile)
 
-        print('calculation of user similarity matrix(similarity factor) done',
-              file=outfile)
-        print('\nTotal similarity factor number = %d' %
-              simfactor_count, file=outfile)
+        print ('calculation of user similarity matrix(similarity factor) done',
+               )
+        print ('\nTotal similarity factor number = %d' %
+               simfactor_count, file=outfile)
 
     def recommend(self, user):
         ''' Find K similar users and recommend N movies. '''
@@ -134,12 +135,11 @@ class UserBasedCF:
                 rank.setdefault(movie, 0)
                 rank[movie] += similarity_factor
         # return the N best movies
-
         return sorted(rank.items(), key=itemgetter(1), reverse=True)[0:N]
 
     def evaluate(self):
         ''' print evaluation result: precision, recall, coverage and popularity '''
-        print('\nEvaluation start...', file=outfile)
+        print ('\nEvaluation start...', file=outfile)
 
         N = self.n_rec_movie
         #  varables for precision and recall
@@ -153,7 +153,7 @@ class UserBasedCF:
 
         for i, user in enumerate(self.trainset):
             if i % 500 == 0:
-                print('recommended for %d users' % i, file=outfile)
+                print ('recommended for %d users')
             test_movies = self.testset.get(user, {})
             rec_movies = self.recommend(user)
             for movie, _ in rec_movies:
@@ -167,13 +167,21 @@ class UserBasedCF:
         precision = hit / (1.0 * rec_count)
         recall = hit / (1.0 * test_count)
         coverage = len(all_rec_movies) / (1.0 * self.movie_count)
-        popularity = popular_sum / (1.0 * rec_count)
+        #popularity = popular_sum / (1.0 * rec_count)
 
-        print('\nprecision=%.4f\nrecall=%.4f\ncoverage=%.4f\npopularity=%.4f' %
-              (precision, recall, coverage, popularity), file=outfile)
+        #print ('\nprecision=%.4f\nrecall=%.4f\ncoverage=%.4f\npopularity=%.4f' %
+               #(precision, recall, coverage, popularity), file=outfile)
+        print ('\nprecision=%.4f\nrecall=%.4f\ncoverage=%.4f' %
+               (precision, recall, coverage), file=outfile)
+        print ('precision=%.4f\nrecall=%.4f\ncoverage=%.4f' %
+               (precision, recall, coverage), file=graphfile)
 
 
-def get_top_n(predictions, n=10):
+
+
+
+
+def get_top_n(predictions, n=30):
     # First map the predictions to each user.
     top_n = defaultdict(list)
     for uid, iid, true_r, est, _ in predictions:
@@ -187,7 +195,7 @@ def get_top_n(predictions, n=10):
     return top_n
 
 
-def predictions(data, rec_inp=10, split_inp=.20):
+def predictions(data, rec_inp=30, split_inp=.3):
     trainset, testset = train_test_split(data, test_size=split_inp)
     algo = SVD()
     algo.fit(trainset)
@@ -205,7 +213,7 @@ from surprise import SVD
 from surprise.model_selection import KFold, train_test_split
 
 
-def precision_recall_at_k(predictions, k=10, threshold=3.5):
+def precision_recall_at_k(predictions, k=30, threshold=3.5):
     '''Return precision and recall at k metrics for each user.'''
 
     # First map the predictions to each user.
@@ -250,7 +258,7 @@ def generate_graph(data, user_inp):
         predictions = algo.test(testset)
         # precisions, recalls = precision_recall_at_k(predictions, k=5, threshold=4)
         results = []
-        for i in range(2, 11):
+        for i in range(2, user_inp):
             precisions, recalls = precision_recall_at_k(predictions, k=i, threshold=2.5)
 
             # Precision and recall can then be averaged over all users
@@ -311,21 +319,27 @@ if __name__ == '__main__':
     datafile = sys.argv[1]
     ratingfile = os.path.join('machinelearning', 'datasets', datafile)
 
-    # open file to write output to    
+    # open file to write output to
     outfile = open("results.txt", "w")
+    graphfile = open("graph_data.txt", "w")
 
     # User input
     train_perc = float(sys.argv[2])  # percentage of data to be used for training
     n_sim_users = int(sys.argv[3])  # number of similar users to consider
     n_movie_rec = int(sys.argv[4])  # number of movies to recommend to target users
 
-    # Create object, calculate similarities for recommendation and evaluate 
-    usercf = UserBasedCF(n_sim_users, n_movie_rec)
-    usercf.generate_dataset(ratingfile, train_perc)
-    usercf.calc_user_sim()
-    usercf.evaluate()
+    # Create object, calculate similarities for recommendation and evaluate
+    for num_sim_users in [n_sim_users - 5, n_sim_users, n_sim_users + 5]:
+        usercf = UserBasedCF(num_sim_users, n_movie_rec)
+        usercf.generate_dataset(ratingfile, train_perc)
+        usercf.calc_user_sim()
+        usercf.evaluate()
+
+    # close file
     outfile.close()
+    graphfile.close()
 
 reader = Reader(line_format='user item rating timestamp', sep='::')
 data = Dataset.load_from_file(ratingfile, reader=reader)
+
 generate_graph(data, n_movie_rec - 1)

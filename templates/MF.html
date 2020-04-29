@@ -8,7 +8,9 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {
+body
+
+{
   font-family: Verdana;
   color: grey;
 }
@@ -65,12 +67,14 @@ div.a {
 }
 
 div.b {
-  text-indent: 30px;
-}
+  text-indent: 30px;}
+
+
 
 
 </style>
 </head>
+
 
 <div class="split left">
 <div class="formcontainer">
@@ -122,7 +126,10 @@ div.b {
             <div class="col-sm-10">
               <button type="submit" class="btn btn-primary">Run Model</button>
             </div>
-          </div>		      
+
+
+          </div>
+
 		      <br>
 		</form>
 </div>
@@ -139,22 +146,80 @@ div.b {
 </nav>
 <br>
 
-</div>
-<div class=a>	
-		      {% if data %}          
-              {% for d in data %}
-		      <div class=a>{{d}}</div><br>
-			  {% endfor %}
-              {% endif %}
-		  
-    <br>
-	<br>
-</div>
-</div> 
-</div>   
-    
-</body>
+<div class=a>
 
+     {% if data or graph_data %}
+              {% for d in data %}
+
+     <div class=a>{{d}}</div><br>
+ {% endfor %}
+
+
+</div>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<!--  -->
+<div id="container" style="width: 600px; height: 300px; margin: 1em; border: 1px solid gray"></div>
+
+<script language="JavaScript">
+document.addEventListener('DOMContentLoaded', function () {
+        var chart1 = Highcharts.chart({
+    chart: {
+        renderTo: 'container',
+        type: 'bar',
+width: 550
+    },
+    title: {
+        text: 'Evaluation Metrics'
+    },
+    xAxis: {
+        categories: ['Precision', 'Recall', 'Coverage']
+
+    },
+    yAxis: {
+        title: {
+            text: 'Scores'
+        }
+    },
+      credits: {
+    enabled: false
+  },
+tooltip: {
+shared: true,
+useHTML: true
+},
+    series: [{
+        name: 'system users 1',
+        data: {{graph_data1}}
+    },{
+        name: 'your users',
+        data: {{graph_data2}}
+    },{
+        name: 'system users 2',
+        data: {{graph_data3}}
+    }
+]
+});
+    });
+
+</script>
+
+
+
+
+
+              {% endif %}
+
+    <br>
+<br>
+
+</div>
+</div>
+
+</body>
 
 
 

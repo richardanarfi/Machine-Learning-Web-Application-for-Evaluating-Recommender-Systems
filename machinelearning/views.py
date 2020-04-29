@@ -1,7 +1,7 @@
+import sys
 from subprocess import run, PIPE
 
 from django.shortcuts import render
-from pylab import *
 
 
 def NN_model(request):
@@ -61,14 +61,26 @@ def matrixFactorization(request):
     print(input2)
     print(input3)
     print(input4)
-    #input1 = "ratings100k.dat"
-    #input2 = "0.7"
-    #input3 = "20"
-    #input4 = "10"
-    #out= run([sys.executable,'//cf.py',inp],shell=False,stdout=PIPE)
-    run([sys.executable,"machinelearning/cf.py",input1,input2,input3,input4],shell=False,stdout=PIPE)
-    #print(out)
-    file = open("results.txt","r").readlines()
+    # input1 = "ratings100k.dat"
+    # input2 = "0.7"
+    # input3 = "20"
+    # input4 = "10"
+    # out= run([sys.executable,'//cf.py',inp],shell=False,stdout=PIPE)
+    run([sys.executable, "machinelearning/cf.py", input1, input2, input3, input4], shell=False, stdout=PIPE)
+    # print(out)
+    file = open("results.txt", "r").readlines()
+    graph_data = open("graph_data.txt", "r").readlines()
+    graph_data = [x.strip("\n").split('=') for x in graph_data]
+    data2 = []
+    for item in graph_data:
+        data2.append(float(item[1]))
+    graph_set1 = data2[:3]
+    graph_set2 = data2[3:6]
+    graph_set3 = data2[6:]
+    user1 = str(int(input3) - 5) + ' users'
+    user2 = input3 + ' users'
+    user3 = str(int(input3) + 5) + 'users'
+    return render(request, 'MF.html',
+                  {'data': file, 'graph_data1': graph_set1, 'graph_data2': graph_set2, 'graph_data3': graph_set3,
+                   'user_data1': user1, 'user_data2': user2, 'user_data3': user3})
 
-
-    return render(request,'MF.html',{'data':file})
