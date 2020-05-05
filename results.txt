@@ -10,9 +10,9 @@ Total similarity factor number = 811712
 
 Evaluation start...
 
-precision=0.3122
-recall=0.1959
-coverage=0.3574
+precision=0.3123
+recall=0.1960
+coverage=0.3581
 Number of similar users to consider = 20
 Number of movies to recommend = 20
 
@@ -25,7 +25,7 @@ Total similarity factor number = 807902
 
 Evaluation start...
 
-precision=0.3230
+precision=0.3231
 recall=0.2025
 coverage=0.3095
 Number of similar users to consider = 25
@@ -40,6 +40,6 @@ Total similarity factor number = 808944
 
 Evaluation start...
 
-precision=0.3286
+precision=0.3285
 recall=0.2062
 coverage=0.2843

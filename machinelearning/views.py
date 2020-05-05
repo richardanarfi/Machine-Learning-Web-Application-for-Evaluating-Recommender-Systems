@@ -1,27 +1,14 @@
-def ContentBased(request):
-    print(request.POST)
-    input1 = request.POST.get('movie_title')
-    print(input1)
-    #input1 = "ratings100k.dat"
-    #input2 = "0.7"
-    #input3 = "20"
-    #input4 = "10"
-    #out= run([sys.executable,'//cf.py',inp],shell=False,stdout=PIPE)
-    run([sys.executable,"machinelearning/cf2.py",input1],shell=False,stdout=PIPE)
-    #print(out)
-    file = open("machinelearning/file.txt","r").readlines()
-    return render(request,'CF.html',{'data':file})
+import sys
 from subprocess import run, PIPE
 
 from django.shortcuts import render
-from pylab import *
 
 
 def NN_model(request):
     print(request.POST)
     train_test = request.POST.get('train_test')
     activation_function = request.POST.get('activation_function')
-    dropout = int(request.POST.get('dropout'))/100
+    dropout = int(request.POST.get('dropout')) / 100
     n_epochs = request.POST.get('n_epochs')
     gru_layers = request.POST.get('gru_layers')
     loss = request.POST.get('loss')
@@ -47,68 +34,23 @@ def NN_model(request):
     input5 = '--dropout=' + str(dropout)
     input6 = '--loss=' + loss
     input7 = '--final_act=' + final_act
-    #train = False
-    #test = False
+    # train = False
+    # test = False
     if train:
-        run([sys.executable, 'machinelearning/NN_model/main.py', input1, input2, input3, input4, input5, input6, input7], shell=False, stdout=PIPE)
+        run([sys.executable, 'machinelearning/NN_model/main.py', input1, input2, input3, input4, input5, input6,
+             input7], shell=False, stdout=PIPE)
     if train and test:
         input1 = '--train=0'
-        run([sys.executable, 'machinelearning/NN_model/main.py', input1, input2, input3, input4, input5, input6, input7], shell=False, stdout=PIPE)
+        run([sys.executable, 'machinelearning/NN_model/main.py', input1, input2, input3, input4, input5, input6,
+             input7], shell=False, stdout=PIPE)
     elif test:
         run([sys.executable, 'machinelearning/NN_model/main.py', input1, input3], shell=False, stdout=PIPE)
 
     out1 = open('train_results.txt', 'r').readlines()
-    out2 = open('test_results.txt', 'r').readlines()
-    out3 = []
-    out4 = []
-    out5 = []
-    out6 = []
-    recall1 = []
-    recall2 = []
-    mrr1 = []
-    mrr2 = []
 
-    with open('train_results.txt') as graphsource:
-        next(graphsource)
-        next(graphsource)
-        allrawdata = []
-        for line in graphsource:
-            tmp = re.findall(r'\d+(?:\.\d+)?', line)
-            allrawdata.append(tmp)
-	
-    for i in range(len(allrawdata)):
-        ep = int(allrawdata[i][0], 10)
-        step = int(allrawdata[i][1], 10)
-        lr = float(allrawdata[i][2])
-        loss = float(allrawdata[i][3])
-        out3.append(ep)
-        out4.append(step)
-        out5.append(lr)
-        out6.append(loss)
-		
-    with open('test_results.txt') as graphsource:
-        next(graphsource)
-        next(graphsource)
-        next(graphsource)
-        next(graphsource)
-        allrawdata = []
-        for line in graphsource:
-            tmp = re.findall(r'\d+(?:\.\d+)?', line)
-            allrawdata.append(tmp)
-			
-    for i in range(len(allrawdata)):
-        if i % 2 == 1:
-            tr1 = int(allrawdata[i][0], 10)
-            tr2 = float(allrawdata[i][1])
-            recall1.append(tr1)
-            recall2.append(tr2)
-        if i % 2 == 0:
-            tr3 = int(allrawdata[i][0], 10)
-            tr4 = float(allrawdata[i][1])
-            mrr1.append(tr3)
-            mrr2.append(tr4)
-			
-    return render(request, 'NN.html', {'data_train': out1, 'data_test': out2, 'data_epochs': out3, 'data_rate': out4, 'data_lr': out5, 'data_loss': out6, 'recall1': recall1, 'recall2': recall2, 'mrr1': mrr1, 'mrr2': mrr2})
+    out2 = open('test_results.txt', 'r').readlines()
+
+    return render(request, 'NN.html', {'data_train': out1, 'data_test': out2})
 
 
 def matrixFactorization(request):
@@ -121,14 +63,26 @@ def matrixFactorization(request):
     print(input2)
     print(input3)
     print(input4)
-    #input1 = "ratings100k.dat"
-    #input2 = "0.7"
-    #input3 = "20"
-    #input4 = "10"
-    #out= run([sys.executable,'//cf.py',inp],shell=False,stdout=PIPE)
-    run([sys.executable,"machinelearning/cf.py",input1,input2,input3,input4],shell=False,stdout=PIPE)
-    #print(out)
-    file = open("results.txt","r").readlines()
-    return render(request,'MF.html',{'data':file})
+    # input1 = "ratings100k.dat"
+    # input2 = "0.7"
+    # input3 = "20"
+    # input4 = "10"
+    # out= run([sys.executable,'//cf.py',inp],shell=False,stdout=PIPE)
+    run([sys.executable, "machinelearning/cf.py", input1, input2, input3, input4], shell=False, stdout=PIPE)
+    # print(out)
+    file = open("results.txt", "r").readlines()
+    graph_data = open("graph_data.txt", "r").readlines()
+    graph_data = [x.strip("\n").split('=') for x in graph_data]
+    data2 = []
+    for item in graph_data:
+        data2.append(float(item[1]))
+    graph_set1 = data2[:3]
+    graph_set2 = data2[3:6]
+    graph_set3 = data2[6:]
+    user1 = str(int(input3) - 5) + ' users'
+    user2 = input3 + ' users'
+    user3 = str(int(input3) + 5) + 'users'
+    return render(request, 'MF.html',
+                  {'data': file, 'graph_data1': graph_set1, 'graph_data2': graph_set2, 'graph_data3': graph_set3,
+                   'user_data1': user1, 'user_data2': user2, 'user_data3': user3})
 
-    return render(request,'MF.html',{'data':file})
