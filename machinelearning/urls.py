@@ -13,12 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+#from pages import views as vw
+# from pages import views as vw
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
-#from pages import views as vw
-from django.conf.urls import url
+
 from . import views
+# from pages import views as vw
 # from pages import views as vw
 from django.conf.urls import url
 from django.contrib import admin
@@ -39,5 +42,4 @@ urlpatterns = [
 	path('', TemplateView.as_view(template_name='index.html'), name='index'),
 	url(r'^NN_model/', views.NN_model),
 	url(r'^matrixFactorization', views.matrixFactorization),
-	url(r'^ContentBased', views.ContentBased),
 ]
