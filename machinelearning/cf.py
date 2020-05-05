@@ -2,9 +2,8 @@ import math
 import os
 import random
 import sys
+from collections import defaultdict
 from operator import itemgetter
-
-from surprise import Reader
 
 random.seed(0)
 
@@ -199,8 +198,3 @@ if __name__ == '__main__':
     # close file
     outfile.close()
     graphfile.close()
-
-reader = Reader(line_format='user item rating timestamp', sep='::')
-data = Dataset.load_from_file(ratingfile, reader=reader)
-
-generate_graph(data, n_movie_rec - 1)
