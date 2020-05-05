@@ -5,3 +5,41 @@ train set = 69945
 test set = 30055
 
 total movie number = 1631
+
+Total similarity factor number = 811712
+
+Evaluation start...
+
+precision=0.3122
+recall=0.1959
+coverage=0.3581
+Number of similar users to consider = 20
+Number of movies to recommend = 20
+
+train set = 69909
+test set = 30091
+
+total movie number = 1625
+
+Total similarity factor number = 807902
+
+Evaluation start...
+
+precision=0.3229
+recall=0.2024
+coverage=0.3095
+Number of similar users to consider = 25
+Number of movies to recommend = 20
+
+train set = 69953
+test set = 30047
+
+total movie number = 1639
+
+Total similarity factor number = 808944
+
+Evaluation start...
+
+precision=0.3287
+recall=0.2063
+coverage=0.2843
