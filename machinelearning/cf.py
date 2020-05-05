@@ -5,9 +5,8 @@ import sys
 from operator import itemgetter
 
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 import plotly.offline as py
-from plotly.subplots import make_subplots
+import plotly.tools as tls
 from surprise import Reader
 
 random.seed(0)
@@ -281,35 +280,16 @@ def generate_graph(data, user_inp):
     plt.ylabel('Recall')
     for tl in plt2.get_yticklabels():
         tl.set_color('r')
-    #fig = plt.Figure()
-    #fig2 = go.Figure()
-    fig2 = make_subplots(specs=[[{"secondary_y": True}]])
-
-    fig2.add_trace(
-        go.Scatter(x=Rec, y=Precision, name="Precision "),
-        secondary_y=False,
-    )
-    fig2.add_trace(
-        go.Scatter(x=Rec, y=Recall, name="Recall"),
-        secondary_y=True,
-    )
-
-    # Add figure title
-    fig2.update_layout(
-        title_text="Precision Recall Curve"
-    )
-
-    # Set x-axis title
-    fig2.update_xaxes(title_text="# of Reccomended Items")
-
-    # Set y-axes titles
-    fig2.update_yaxes(title_text="<b>Precision</b>", secondary_y=False)
-    fig2.update_yaxes(title_text="<b>Recall</b>", secondary_y=True)
-
-
-    py.plot(fig2, filename='Precision')
-
-
+    plt.show()
+    plt.savefig('./recallprecision.png')
+    fig = plt.Figure()
+    ax = fig.gca()
+    ax2 = ax.twinx()
+    ax2.plot(Rec,Precision)
+    ax.plot(Rec,Precision)
+   # canvas = FigureCanvas(fig)
+    plotly_fig = tls.mpl_to_plotly(fig)
+    py.plot(plotly_fig, filename='Precision')
 
 
 

@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django_matplotlib',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'pages.apps.PagesConfig',
@@ -115,12 +114,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+MEDIA_URL = '/assets/'
 STATICFILES_DIRS = [(os.path.join(BASE_DIR, 'assets')) ]
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-MEDIA_ROOT = os.path.join(STATIC_ROOT,'media')
+
 # Update as needed.
 
 LOGIN_REDIRECT_URL = '/dashboard'
