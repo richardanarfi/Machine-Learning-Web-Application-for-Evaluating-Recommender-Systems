@@ -11,6 +11,7 @@ def ContentBased(request):
     #print(out)
     file = open("machinelearning/file.txt","r").readlines()
     return render(request,'CF.html',{'data':file})
+
 from subprocess import run, PIPE
 
 from django.shortcuts import render
@@ -129,6 +130,10 @@ def matrixFactorization(request):
     run([sys.executable,"machinelearning/cf.py",input1,input2,input3,input4],shell=False,stdout=PIPE)
     #print(out)
     file = open("results.txt","r").readlines()
-    return render(request,'MF.html',{'data':file})
 
     return render(request,'MF.html',{'data':file})
+
+
+
+    return render(request,'MF.html',{'data':file})
+
