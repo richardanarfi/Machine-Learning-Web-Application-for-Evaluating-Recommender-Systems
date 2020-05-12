@@ -100,6 +100,14 @@ div.a {
 div.b {
   text-indent: 20px;
 }
+
+.ajaxProgress {
+	display: none;
+	text-align: center;
+	padding: 20px;
+	width: 300px;
+}
+
 </style>
 </head>
 <body>
@@ -187,10 +195,33 @@ div.b {
 <div class="split right">
 
 	<div class="container b">
-            <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-                <a><b><font size="4" color="#34495E">TRAIN/TEST RESULTS</font></b></a>
-              </nav>
-           </div>
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <a><b><font size="4" color="#34495E">TRAIN/TEST RESULTS</font></b></a>
+            </nav>
+    </div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div class="ajaxProgress">
+	<img src="https://imgur.com/2SoD8bX.gif"/>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("button").click(function(){
+		$('.ajaxProgress').show();
+		$.ajax({
+			type: "GET",
+			dataType: "json",
+			async: true,
+			data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+				success: function (json) {
+					$('.ajaxProgress').hide();
+				}
+		});
+	});
+});
+	
+</script>
 {% if data_train or data_test %}
 	
 <script> 
@@ -285,7 +316,7 @@ Highcharts.chart('container2', {
 </script>
 
 {% endif %}
-</div>   
+</div>
 {% endblock %}
 
 </body>
