@@ -145,14 +145,6 @@ div.b {
 </nav>
 <br>
 
-<div class=a>
-
-     {% if data or graph_data %}
-              {% for d in data %}
-
-     <div class=a>{{d}}</div><br>
- {% endfor %}
-
 
 </div>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -161,16 +153,18 @@ div.b {
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 <!--  -->
-<div id="container" style="width: 600px; height: 300px; margin: 1em; border: 1px solid gray"></div>
+<div id="container" style="width: 600px; height: 300px; margin: 1em; border: 1px ghost white"></div>
 
 <script language="JavaScript">
 document.addEventListener('DOMContentLoaded', function () {
+
         var chart1 = Highcharts.chart({
     chart: {
         renderTo: 'container',
         type: 'bar',
 width: 550
     },
+
     title: {
         text: 'Evaluation Metrics'
     },
@@ -186,6 +180,7 @@ width: 550
       credits: {
     enabled: false
   },
+
 tooltip: {
 shared: true,
 useHTML: true
@@ -200,12 +195,66 @@ useHTML: true
         name: 'system users 2',
         data: {{graph_data3}}
     }
-]
+],
+exporting: {
+         showTable:true ,
+         }
+});
+    });
+
+
+</script>
+
+
+    <br><br><br>
+
+<div id="container2" style="width: 600px; height: 300px; margin: 1em; border: 1px ghost white"></div>
+
+<script language="JavaScript">
+document.addEventListener('DOMContentLoaded', function () {
+
+        var chart1 = Highcharts.chart({
+    chart: {
+        renderTo: 'container2',
+        type: 'line',
+width: 550
+    },
+
+    title: {
+        text: 'Precision Recall Curve'
+    },
+    xAxis: {
+       title: {
+       text: 'Recall' },
+       categories: {{rec}}
+
+    },
+    yAxis: {
+        title: {
+            text: 'Precision'
+        }
+    },
+      credits: {
+    enabled: false
+  },
+
+tooltip: {
+shared: true,
+useHTML: true
+},
+    series: [{
+        name: 'Precision Recall Curve',
+        data: {{prec}}
+    }
+],
+
 });
     });
 
 </script>
-              {% endif %}
+<br>
+
+
 
     <br>
 <br>

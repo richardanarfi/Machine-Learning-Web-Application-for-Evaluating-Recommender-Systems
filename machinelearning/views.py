@@ -73,16 +73,38 @@ def matrixFactorization(request):
     file = open("results.txt", "r").readlines()
     graph_data = open("graph_data.txt", "r").readlines()
     graph_data = [x.strip("\n").split('=') for x in graph_data]
+    graph_prec = open("graph_data2.txt","r").readlines()
+    graph_prec = [x.strip("\n").split('=') for x in graph_prec]
+    graph_rec = open("graph_data3.txt","r").readlines()
+    graph_rec = [x.strip("\n").split('=') for x in graph_rec]
     data2 = []
+    data3 = []
+    data4 = []
+
     for item in graph_data:
         data2.append(float(item[1]))
+
+    for item2 in graph_prec:
+        data3.append(float(item2[1]))
+
+    for item3 in graph_rec:
+        data4.append(float(item3[1]))
+
+
     graph_set1 = data2[:3]
     graph_set2 = data2[3:6]
     graph_set3 = data2[6:]
+
+    graph_set4 = data3[:3]
+    graph_set5 = data4[:3]
+
+
     user1 = str(int(input3) - 5) + ' users'
     user2 = input3 + ' users'
     user3 = str(int(input3) + 5) + 'users'
+
+
     return render(request, 'MF.html',
-                  {'data': file, 'graph_data1': graph_set1, 'graph_data2': graph_set2, 'graph_data3': graph_set3,
-                   'user_data1': user1, 'user_data2': user2, 'user_data3': user3})
+                  {'data': file, 'graph_data1': graph_set1, 'graph_data2': graph_set2, 'graph_data3': graph_set3
+                   ,'user_data1': user1, 'user_data2': user2, 'user_data3': user3,'prec': graph_set4,'rec':graph_set5})
 

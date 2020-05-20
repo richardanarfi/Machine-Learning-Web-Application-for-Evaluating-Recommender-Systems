@@ -1,7 +1,5 @@
 import math
-import os
 import random
-import sys
 from collections import defaultdict
 from operator import itemgetter
 
@@ -23,9 +21,9 @@ class UserBasedCF:
         self.movie_popular = {}
         self.movie_count = 0
 
-        print ('Number of similar users to consider = %d' % self.n_sim_user, file=outfile)
+        print ('Number of similar users to consider = %d' % self.n_sim_user)
         print ('Number of movies to recommend = %d\n' %
-               self.n_rec_movie, file=outfile)
+               self.n_rec_movie)
 
     @staticmethod
     def loadfile(filename):
@@ -54,10 +52,15 @@ class UserBasedCF:
                 self.testset.setdefault(user, {})
                 self.testset[user][movie] = int(rating)
                 testset_len += 1
+         ####testing
+        assert (trainset_len != testset_len)
+        shared_items = {k: self.trainset[k] for k in self.trainset if k in self.testset and self.trainset[k] == self.testset[k]}
+        num_of_similar_items = (len(shared_items))
 
-        print ('\ndone splitting training and test set')
-        print ('train set = %s' % trainset_len, file=outfile)
-        print ('test set = %s' % testset_len, file=outfile)
+        print ('\n Number of items in both train and test set after initial split=%.4f' %
+        (num_of_similar_items),file=outfile)
+       # assert(self.trainset[user][movie] != self.testset[user][movie]).any()
+
 
 
 
@@ -82,7 +85,7 @@ class UserBasedCF:
 
         # save the total movie number, which will be used in evaluation
         self.movie_count = len(movie2users)
-        print ('\ntotal movie number = %d' % self.movie_count, file=outfile)
+        print ('\ntotal movie number = %d' % self.movie_count)
 
         # count co-rated items between users
         usersim_mat = self.user_sim_mat
@@ -109,12 +112,12 @@ class UserBasedCF:
                 simfactor_count += 1
                 if simfactor_count % PRINT_STEP == 0:
                     print ('calculating user similarity factor(%d)' %
-                           simfactor_count, file=outfile)
+                           simfactor_count)
 
         print ('calculation of user similarity matrix(similarity factor) done',
                )
         print ('\nTotal similarity factor number = %d' %
-               simfactor_count, file=outfile)
+               simfactor_count)
 
     def recommend(self, user):
         ''' Find K similar users and recommend N movies. '''
@@ -136,7 +139,7 @@ class UserBasedCF:
 
     def evaluate(self):
         ''' print evaluation result: precision, recall, coverage and popularity '''
-        print ('\nEvaluation start...', file=outfile)
+        print ('\nEvaluating test and train set similarity')
 
         N = self.n_rec_movie
         #  varables for precision and recall
@@ -156,26 +159,24 @@ class UserBasedCF:
             for movie, _ in rec_movies:
                 if movie in test_movies:
                     hit += 1
+
                 all_rec_movies.add(movie)
+
                 popular_sum += math.log(1 + self.movie_popular[movie])
             rec_count += N
             test_count += len(test_movies)
 
-        precision = round(hit / (1.0 * rec_count),3)
-        recall =round(hit / (1.0 * test_count),3)
-        coverage = round(len(all_rec_movies) / (1.0 * self.movie_count),3)
-        #popularity = popular_sum / (1.0 * rec_count)
+        precision = round(hit / (1.0 * rec_count), 3)
+        recall = round(hit / (1.0 * test_count), 3)
+        coverage = round(len(all_rec_movies) / (1.0 * self.movie_count), 3)
+        similar_items = len(all_rec_movies)
+        popularity = popular_sum / (1.0 * rec_count)
 
-        #print ('\nprecision=%.4f\nrecall=%.4f\ncoverage=%.4f\npopularity=%.4f' %
-               #(precision, recall, coverage, popularity), file=outfile)
-        print ('\nprecision=%.4f\nrecall=%.4f\ncoverage=%.4f' %
-               (precision, recall, coverage), file=outfile)
-        print ('precision=%.4f\nrecall=%.4f\ncoverage=%.4f' %
-               (precision, recall, coverage), file=graphfile)
+        print ('\nprecision=%.4f\nrecall=%.4f\ncoverage=%.4f\npopularity=%.4f\nsimilaritems=%.4f' %
+        (precision, recall, coverage, popularity,similar_items),file=outfile)
 
-        print('precision=%.4f' % (precision), file=graphfile2)
-
-        print('recall=%.4f' % (recall), file=graphfile3)
+          #  print('\nTotal similar items = %d' %
+               #   similar_items)
 
 
 
@@ -184,31 +185,24 @@ class UserBasedCF:
 
 if __name__ == '__main__':
     # Dataset
-    datafile = sys.argv[1]
-    ratingfile = os.path.join('machinelearning', 'datasets', datafile)
-
+    datafile = "/Users/ashleyfarrell/cs682.1/machinelearning/datasets/ratings100k.dat"
+    #ratingfile = os.path.join('machinelearning', 'datasets', datafile)
+    ratingfile =  datafile
     # open file to write output to
-    outfile = open("results.txt", "w")
-    graphfile = open("graph_data.txt", "w")
-
-    graphfile2 = open("graph_data2.txt", "w")
-
-    graphfile3 = open("graph_data3.txt", "w")
-
+    outfile = open("unittest_results.txt", "w")
     # User input
-    train_perc = float(sys.argv[2])  # percentage of data to be used for training
-    n_sim_users = int(sys.argv[3])  # number of similar users to consider
-    n_movie_rec = int(sys.argv[4])  # number of movies to recommend to target users
+    train_perc = float(.7)  # percentage of data to be used for training
+    n_sim_users = int(10)  # number of similar users to consider
+    n_movie_rec = int(10)  # number of movies to recommend to target users
 
     # Create object, calculate similarities for recommendation and evaluate
     for num_sim_users in [n_sim_users - 5, n_sim_users, n_sim_users + 5]:
-        usercf = UserBasedCF(num_sim_users, n_movie_rec)
-        usercf.generate_dataset(ratingfile, train_perc)
+        usercf = UserBasedCF()
+        usercf.generate_dataset(ratingfile)
+      #  outfile.close()
         usercf.calc_user_sim()
         usercf.evaluate()
 
-    # close file
+
     outfile.close()
-    graphfile.close()
-    graphfile2.close()
-    graphfile3.close()
+
