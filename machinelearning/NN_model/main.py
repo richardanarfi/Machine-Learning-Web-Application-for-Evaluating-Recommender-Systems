@@ -15,9 +15,7 @@ import evaluation
 
 
 
-PATH_TO_TRAIN = 'C:/Users/bkwap/Desktop/' + \
-'Web-Application-for-Evaluating-Recommender-Systems-Machine-Learning-Models/machinelearning/' + \
-'NN_model/ratings.csv' #/PATH/TO/rsc15_train_full.txt'
+PATH_TO_TRAIN = 'machinelearning/NN_model/ratings.csv' 
 
 
 class ARGS():
