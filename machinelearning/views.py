@@ -1,39 +1,78 @@
-import sys
-from subprocess import run, PIPE
-
 from django.shortcuts import render
+import sys
+from subprocess import run,PIPE
+
+from django.http import HttpResponse
+from matplotlib import pylab
+from pylab import *
+import PIL, PIL.Image, io as StringIO
+import re
+import mimetypes
+
+
+def ContentBased(request):
+    print(request.POST)
+    input1 = request.POST.get('movie_title')
+    print(input1)
+    #input1 = "ratings100k.dat"
+    #input2 = "0.7"
+    #input3 = "20"
+    #input4 = "10"
+    #out= run([sys.executable,'//cf.py',inp],shell=False,stdout=PIPE)
+    run([sys.executable,"machinelearning/cf2.py",input1],shell=False,stdout=PIPE)
+    #print(out)
+    file = open("machinelearning/file.txt","r").readlines()
+    return render(request,'CF.html',{'data':file})
 
 
 def NN_model(request):
     print(request.POST)
     train_test = request.POST.get('train_test')
     activation_function = request.POST.get('activation_function')
-    dropout = int(request.POST.get('dropout'))/100
+    if request.POST.get('dropout'):
+        dropout = int(request.POST.get('dropout'))/100
     n_epochs = request.POST.get('n_epochs')
     gru_layers = request.POST.get('gru_layers')
     loss = request.POST.get('loss')
     final_act = request.POST.get('final_act')
-    test_epochs = int(n_epochs) - 1
+    test_epochs = 0
+    if n_epochs:
+        test_epochs = int(n_epochs)
     if train_test == 'Train_Test':
         train = 1
-        test_epochs = int(n_epochs) - 1
-        test = test_epochs
+        if n_epochs:
+            test_epochs = int(n_epochs)
+        else:
+            test_epochs = 5
+        test = test_epochs - 1
     elif train_test == 'Train':
         train = 1
         test = 0
     elif train_test == 'Evaluate':
         train = 0
-        test = test_epochs
+        test = 100
     else:
         train = 0
         test = 0
     input1 = '--train=' + str(train)
-    input2 = '--epoch=' + str(n_epochs)
+    input2 = '--epoch=' + str(test_epochs)
     input3 = '--test=' + str(test)
-    input4 = '--hidden_act=' + activation_function
-    input5 = '--dropout=' + str(dropout)
-    input6 = '--loss=' + loss
-    input7 = '--final_act=' + final_act
+    if activation_function:
+        input4 = '--hidden_act=' + activation_function
+    else:
+        input4 = '--hidden_act=tanh'
+    if request.POST.get('dropout'):
+        input5 = '--dropout=' + str(dropout)
+    else:
+        input5 = '--dropout=0.5'
+    if loss:
+        input6 = '--loss=' + loss
+    else:
+        input6 = '--loss=cross-entropy'
+    if final_act:
+        input7 = '--final_act=' + final_act
+    else:
+        input7 = '--final_act=softmax'
     #train = False
     #test = False
     if train:
@@ -60,10 +99,12 @@ def NN_model(request):
         next(graphsource)
         allrawdata = []
         for line in graphsource:
-            tmp = re.findall(r'\d+(?:\.\d+)?', line)
-            allrawdata.append(tmp)
+            if len(line) > 0:
+                tmp = re.findall(r'\d+(?:\.\d+)?', line)
+                allrawdata.append(tmp)
 	
     for i in range(len(allrawdata)):
+        #print(len(allrawdata),(allrawdata[i][0], 10))
         ep = int(allrawdata[i][0], 10)
         step = int(allrawdata[i][1], 10)
         lr = float(allrawdata[i][2])
@@ -84,12 +125,12 @@ def NN_model(request):
             allrawdata.append(tmp)
 			
     for i in range(len(allrawdata)):
-        if i % 2 == 1:
+        if i % 2 == 0:
             tr1 = int(allrawdata[i][0], 10)
             tr2 = float(allrawdata[i][1])
             recall1.append(tr1)
             recall2.append(tr2)
-        if i % 2 == 0:
+        if i % 2 == 1:
             tr3 = int(allrawdata[i][0], 10)
             tr4 = float(allrawdata[i][1])
             mrr1.append(tr3)
@@ -152,4 +193,3 @@ def matrixFactorization(request):
     return render(request, 'MF.html',
                   {'data': file, 'graph_data1': graph_set1, 'graph_data2': graph_set2, 'graph_data3': graph_set3
                    ,'user_data1': user1, 'user_data2': user2, 'user_data3': user3,'prec': graph_set4,'rec':graph_set5})
-

@@ -4,26 +4,34 @@ Created on Feb 26 2017
 Author: Weiping Song
 """
 import os
+import argparse
+import time
 import tensorflow as tf
 import pandas as pd
 import numpy as np
-import argparse
-
+#from sklearn.model_selection import train_test_split
 import model
 import evaluation
 
-from sklearn.model_selection import train_test_split
 
-PATH_TO_TRAIN = 'C:/Users/bkwap/Desktop/Web-Application-for-Evaluating-Recommender-Systems-Machine-Learning-Models/machinelearning/NN_model/ratings.csv' #/PATH/TO/rsc15_train_full.txt'
-#PATH_TO_TEST = 'e:/sundog-consult/Udemy/RecSys/GRU4Rec_TensorFlow-master/ratings.csv' #'/PATH/TO/rsc15_test.txt'
 
-class Args():
+PATH_TO_TRAIN = 'C:/Users/bkwap/Desktop/' + \
+'Web-Application-for-Evaluating-Recommender-Systems-Machine-Learning-Models/machinelearning/' + \
+'NN_model/ratings.csv' #/PATH/TO/rsc15_train_full.txt'
+
+
+class ARGS():
+    '''
+    Define arguments
+    '''
+	# pylint: disable=too-many-instance-attributes
+	# pylint: disable=too-few-public-methods
     is_training = False
     layers = 2
     rnn_size = 100
     n_epochs = 10
     batch_size = 128
-    dropout_p_hidden=1
+    dropout_p_hidden = 1
     learning_rate = 0.001
     decay = 0.96
     decay_steps = 1e4
@@ -41,8 +49,11 @@ class Args():
     hidden_act = 'tanh'
     n_items = -1
 
-def parseArgs():
-    parser = argparse.ArgumentParser(description='GRU4Rec args')
+def parse_args():
+    '''
+    Argument parser
+    '''
+    parser = argparse.ArgumentParser(description='GRU4Rec ARGS')
     parser.add_argument('--layer', default=2, type=int)
     parser.add_argument('--size', default=128, type=int)
     parser.add_argument('--epoch', default=10, type=int)
@@ -53,54 +64,70 @@ def parseArgs():
     parser.add_argument('--final_act', default='softmax', type=str)
     parser.add_argument('--loss', default='cross-entropy', type=str)
     parser.add_argument('--dropout', default='0.5', type=float)
-    
     return parser.parse_args()
 
 
 if __name__ == '__main__':
-    command_line = parseArgs()
-    data = pd.read_csv(PATH_TO_TRAIN, dtype={'movieId': np.int64})
-    valid = data.iloc[90000:, :]
-    data = data.iloc[:90000, :]
-    #valid = pd.read_csv(PATH_TO_TEST, dtype={'movieId': np.int64})
-    #data, valid = train_test_split(data, random_state=42)
-    args = Args()
-    args.n_items = len(data['movieId'].unique())
-    args.layers = command_line.layer
-    args.rnn_size = command_line.size
-    args.n_epochs = command_line.epoch
-    args.learning_rate = command_line.lr
-    args.is_training = command_line.train
-    args.test_model = command_line.test
-    args.hidden_act = command_line.hidden_act
-    args.final_act = command_line.final_act
-    args.loss = command_line.loss
-    args.dropout_p_hidden = 1.0 if args.is_training == 0 else command_line.dropout
-    print(args.dropout_p_hidden)
-    if not os.path.exists(args.checkpoint_dir):
-        os.mkdir(args.checkpoint_dir)
-    gpu_config = tf.ConfigProto()
-    gpu_config.gpu_options.allow_growth = True
-    with tf.Session(config=gpu_config) as sess:
-        gru = model.GRU4Rec(sess, args)
-        if args.is_training:
-            output = open('train_results.txt', 'w')
-            gru.fit(data)
-            output.close()
+    COMMAND_LINE = parse_args()
+    DATA = pd.read_csv(PATH_TO_TRAIN, dtype={'movieId': np.int64})
+    VALID = DATA.iloc[90000:, :]
+    DATA = DATA.iloc[:90000, :]
+    #VALID = pd.read_csv(PATH_TO_TEST, dtype={'movieId': np.int64})
+    #DATA, VALID = train_test_split(DATA, random_state=42)
+    ARGS = ARGS()
+    ARGS.n_items = len(DATA['movieId'].unique())
+    ARGS.layers = COMMAND_LINE.layer
+    ARGS.rnn_size = COMMAND_LINE.size
+    ARGS.n_epochs = COMMAND_LINE.epoch
+    ARGS.learning_rate = COMMAND_LINE.lr
+    ARGS.is_training = COMMAND_LINE.train
+    ARGS.test_model = COMMAND_LINE.test
+    ARGS.hidden_act = COMMAND_LINE.hidden_act
+    ARGS.final_act = COMMAND_LINE.final_act
+    ARGS.loss = COMMAND_LINE.loss
+    ARGS.dropout_p_hidden = 1.0 if ARGS.is_training == 0 else COMMAND_LINE.dropout
+    print(ARGS.dropout_p_hidden)
+    if not os.path.exists(ARGS.checkpoint_dir):
+        os.mkdir(ARGS.checkpoint_dir)
+    GPU_CONFIG = tf.ConfigProto()
+    #GPU_CONFIG.gpu_options.allow_growth = True
+    with tf.Session(config=GPU_CONFIG) as sess:
+        GRU = model.GRU4Rec(sess, ARGS)
+        START_TIME = time.time()
+        if ARGS.is_training:
+            OUTPUT = open('train_results.txt', 'w')
+            GRU.fit(DATA)
+            OUTPUT.close()
+            TRAINING_TIME = time.time()
+            print("Training time =", TRAINING_TIME - START_TIME, "seconds")
         else:
-            test_output = open('test_results.txt', 'w')
-            print("\n\nEvaluating Model....\n", file = test_output)
-            res = evaluation.evaluate_sessions_batch(gru, data, data, 5)
-            print('Recall@5: {}'.format(res[0][0]), file = test_output)
-            print('MRR@5: {}'.format(res[1][0]), file = test_output)
-            #res = evaluation.evaluate_sessions_batch(gru, data, data, 10)
-            print('Recall@10: {}'.format(res[0][1]), file = test_output)
-            print('MRR@10: {}'.format(res[1][1]), file = test_output)
-            #res = evaluation.evaluate_sessions_batch(gru, data, data, 20)
-            print('Recall@20: {}'.format(res[0][2]), file = test_output)
-            print('MRR@20: {}'.format(res[1][2]), file = test_output)
-            #res = evaluation.evaluate_sessions_batch(gru, data, data, 50)
-            print('Recall@50: {}'.format(res[0][3]), file = test_output)
-            print('MRR@50: {}'.format(res[1][3]), file = test_output)
-            test_output.close()
-    
+            TEST_OUTPUT = open('test_results.txt', 'w')
+            print("\n\nEvaluating Model....\n", file=TEST_OUTPUT)
+            RES = evaluation.evaluate_sessions_batch(GRU, DATA, DATA)
+            print('Recall@1: {}'.format(RES[0][0]), file=TEST_OUTPUT)
+            print('MRR@1: {}'.format(RES[1][0]), file=TEST_OUTPUT)
+            print('Recall@2: {}'.format(RES[0][1]), file=TEST_OUTPUT)
+            print('MRR@2: {}'.format(RES[1][1]), file=TEST_OUTPUT)
+            print('Recall@5: {}'.format(RES[0][2]), file=TEST_OUTPUT)
+            print('MRR@5: {}'.format(RES[1][2]), file=TEST_OUTPUT)
+            #RES = evaluation.evaluate_sessions_batch(GRU, DATA, DATA, 10)
+            print('Recall@10: {}'.format(RES[0][3]), file=TEST_OUTPUT)
+            print('MRR@10: {}'.format(RES[1][3]), file=TEST_OUTPUT)
+            #RES = evaluation.evaluate_sessions_batch(GRU, DATA, DATA, 20)
+            print('Recall@20: {}'.format(RES[0][4]), file=TEST_OUTPUT)
+            print('MRR@20: {}'.format(RES[1][4]), file=TEST_OUTPUT)
+            #RES = evaluation.evaluate_sessions_batch(GRU, DATA, DATA, 50)
+            print('Recall@50: {}'.format(RES[0][5]), file=TEST_OUTPUT)
+            print('MRR@50: {}'.format(RES[1][5]), file=TEST_OUTPUT)
+            print('Recall@100: {}'.format(RES[0][6]), file=TEST_OUTPUT)
+            print('MRR@100: {}'.format(RES[1][6]), file=TEST_OUTPUT)
+            #print('Precision@1: {}'.format(RES[2][0]), file = TEST_OUTPUT)
+            #print('Precision@2: {}'.format(RES[2][1]), file = TEST_OUTPUT)
+            #print('Precision@5: {}'.format(RES[2][2]), file = TEST_OUTPUT)
+            #print('Precision@10: {}'.format(RES[2][3]), file = TEST_OUTPUT)
+            #print('Precision@20: {}'.format(RES[2][4]), file = TEST_OUTPUT)
+            #print('Precision@50: {}'.format(RES[2][5]), file = TEST_OUTPUT)
+            #print('Precision@100: {}'.format(RES[2][6]), file = TEST_OUTPUT)
+            TEST_OUTPUT.close()
+        END_TIME = time.time()
+        print("Time elapsed =", END_TIME - START_TIME, "seconds")

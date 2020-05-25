@@ -31,102 +31,85 @@
         return true;
     }
     </script>
-	
-		<script>
-	function train_test_check(){
-	  if(document.getElementById('train_test').value ==='Evaluate'
-	  || document.getElementById('train_test').value ==='Display')
-	  {
-		document.getElementById('activation_function').disabled=true;
-		document.getElementById('n_epochs').disabled=true;
-		document.getElementById('dropout').disabled=true;
-		document.getElementById('gru_layers').disabled=true;
-		document.getElementById('loss').disabled=true;
-		document.getElementById('final_act').disabled=true;
-	}
-	else {
-		document.getElementById('activation_function').disabled=false;
-		document.getElementById('n_epochs').disabled=false;
-		document.getElementById('dropout').disabled=false;
-		document.getElementById('gru_layers').disabled=false;
-		document.getElementById('loss').disabled=false;
-		document.getElementById('final_act').disabled=false;
-	}
-	}
-	
-	</script>
-	<style>
-	body {
-	  font-family: Verdana;
-	  color: #4169E1;
-	  font-size: 14px;
-	}
+<style>
+body {
+  font-family: Verdana;
+  color: #4169E1;
+  font-size: 14px;
+}
 
-	.highcharts-html-tooltip {
-		border: 1px solid #000;
-		background: #fff;
-		display: block;
-		padding: 5px 
-		width: 500px;
-		white-space: normal
-	}
+.highcharts-html-tooltip {
+    border: 1px solid #000;
+    background: #fff;
+    display: block;
+    padding: 5px 
+    width: 500px;
+    white-space: normal
+}
 
-	.split {
-	  height: 90%;
-	  width: 50%;
-	  position: fixed;
-	  z-index: 1;
-	  top: 2;
-	  overflow-x: hidden;
-	  padding-top: 20px;
-	}
+.split {
+  height: 90%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 2;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
 
-	.left {
-	  left: 0;
-	  background-color: white;
-	}
+.left {
+  left: 0;
+  background-color: white;
+}
 
-	.right {
-	  right: 0;
-	  background-color: white;
-	}
+.right {
+  right: 0;
+  background-color: white;
+}
 
-	.centered {
-	  position: absolute;
-	  top: 50%;
-	  left: 50%;
-	  transform: translate(-50%, -50%);
-	  text-align: center;
-	}
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
 
-	.left_text {
-	  left: 10;
-	}
+.left_text {
+  left: 10;
+}
 
-	.centered img {
-	  width: 150px;
-	  border-radius: 50%;
-	}
-	.formcontainer {
-		  text-align: left;
-		  margin: 0px 25px 12px;
-		  width: 100%;
-	}
+.centered img {
+  width: 150px;
+  border-radius: 50%;
+}
+.formcontainer {
+      text-align: left;
+      margin: 0px 25px 12px;
+	  width: 100%;
+}
 
-	div {
-	  text-align: justify;
-	  text-justify: inter-word;
-	}
-	div.a {
-	  text-indent: 50px;
-	}
+div {
+  text-align: justify;
+  text-justify: inter-word;
+}
+div.a {
+  text-indent: 50px;
+}
 
-	div.b {
-	  text-indent: 20px;
-	}
-	</style>
+div.b {
+  text-indent: 20px;
+}
+
+.ajaxProgress {
+	display: none;
+	text-align: center;
+	padding: 20px;
+	width: 300px;
+}
+
+</style>
 </head>
-
 <body>
 
 <div class="split left">
@@ -143,7 +126,7 @@
 	      {% csrf_token %}
 	  
           <label class="my-1 mr-2" for="train_test">Train or Test</label>
-          <select class="custom-select my-1 mr-sm-2 col-md-10 form-control-sm" onchange="train_test_check()" id="train_test" name="train_test">
+          <select class="custom-select my-1 mr-sm-2 col-md-10 form-control-sm" id="train_test" name="train_test" required>
             <option value="">Select train or test... (Default: Display results from last Test)</option>
             <option value="Train_Test">Train and Test</option>
             <option value="Train">Train only</option>
@@ -151,13 +134,13 @@
             <option value="Display">Display results from last Test</option>
           </select>
 		  <label class="my-1 mr-2" for="activation_function">Hidden Layer Activation Function</label>
-          <select class="custom-select my-1 mr-sm-2 col-md-10 form-control-sm" id="activation_function" name="activation_function">
+          <select class="custom-select my-1 mr-sm-2 col-md-10 form-control-sm" id="activation_function" name="activation_function" required>
             <option value="">Select hidden activation function... (Default: tanh)</option>
             <option value="tanh">tanh</option>
             <option value="relu">relu</option>
           </select>
 		  <label class="my-1 mr-2" for="dropout">Dropout percentage</label>
-          <select class="custom-select my-1 mr-sm-2 col-md-10 form-control-sm" id="dropout" name="dropout">
+          <select class="custom-select my-1 mr-sm-2 col-md-10 form-control-sm" id="dropout" name="dropout" required>
             <option value="">Select dropout... (Default: 50%) </option>
             <option value="10">10%</option>
             <option value="20">20%</option>
@@ -190,12 +173,12 @@
     </div>
 	<br>
           <div class="form-group col-md-8">
-            <label for="n_epochs">Enter number of epochs (Defualt is 5)</label>
-            <input type="text" class="form-control form-control-sm" id="n_epochs" name="n_epochs">
+            <label for="n_epochs">Enter number of epochs (Defualt is 10)</label>
+            <input type="text" class="form-control form-control-sm" id="n_epochs" name="n_epochs" required>
           </div>
           <div class="form-group col-md-8">
             <label for="gru_layers">Enter number of GRU layers (Default is 2)</label>
-            <input type="text" class="form-control form-control-sm" id="gru_layers" name="gru_layers">
+            <input type="text" class="form-control form-control-sm" id="gru_layers" name="gru_layers" required>
           </div>
           <div class="form-group row col-md-3">
             <div class="col-sm-10">
@@ -212,10 +195,33 @@
 <div class="split right">
 
 	<div class="container b">
-            <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-                <a><b><font size="4" color="#34495E">TRAIN/TEST RESULTS</font></b></a>
-              </nav>
-           </div>
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <a><b><font size="4" color="#34495E">TRAIN/TEST RESULTS</font></b></a>
+            </nav>
+    </div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div class="ajaxProgress">
+	<img src="https://imgur.com/2SoD8bX.gif"/>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("button").click(function(){
+		$('.ajaxProgress').show();
+		$.ajax({
+			type: "GET",
+			dataType: "json",
+			async: true,
+			data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+				success: function (json) {
+					$('.ajaxProgress').hide();
+				}
+		});
+	});
+});
+	
+</script>
 {% if data_train or data_test %}
 	
 <script> 
@@ -232,7 +238,7 @@
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
-<div id="container" style="width: 600px; height: 350px; margin: 1em; border: 0.5px solid gray"></div>
+<div id="container" style="width: 600px; height: 300px; margin: 1em; border: 1px solid gray"></div>
 
 <script language="JavaScript">
 Highcharts.chart('container', {
@@ -240,10 +246,6 @@ Highcharts.chart('container', {
         type: 'line', 
 		width: 600
     },
-	 credits: {
-     enabled: false
-	},
-
 
     title: {
         text: 'Loss over epochs'
@@ -274,19 +276,15 @@ Highcharts.chart('container', {
     }]
 });
 </script>
-<br><br>
+<br><br><br>
 
-<div id="container2" style="width: 600px; height: 350px; margin: 1em; border: 0.5px solid gray"></div>
+<div id="container2" style="width: 600px; height: 300px; margin: 1em; border: 1px solid gray"></div>
 
 <script language="JavaScript">
 Highcharts.chart('container2', {
 	chart: {
 		type: 'column'
 	},
-	 credits: {
-		enabled: false
-	},
-
 	title: {
 		text: 'Recall and MRR'
 	},
@@ -318,13 +316,8 @@ Highcharts.chart('container2', {
 </script>
 
 {% endif %}
-<br>
-<br>  
-
-</div> 
- 
-</body>
+</div>
 {% endblock %}
 
-
+</body>
 

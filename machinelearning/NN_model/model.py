@@ -3,6 +3,7 @@
 Created on Feb 26, 2017
 @author: Weiping Song
 """
+# pylint: disable=no-name-in-module
 import os
 import tensorflow as tf
 from tensorflow.python.ops import rnn_cell
@@ -10,11 +11,17 @@ import pandas as pd
 import numpy as np
 
 class GRU4Rec:
-    
+    '''
+    GRU4Rec model
+    '''
+	# pylint: disable=too-many-instance-attributes
+	# pylint: disable=too-many-branches
+	# pylint: disable=too-many-statements
+	# pylint: disable=too-many-locals
+	# pylint: disable=no-member
     def __init__(self, sess, args):
         self.sess = sess
         self.is_training = args.is_training
-
         self.layers = args.layers
         self.rnn_size = args.rnn_size
         self.n_epochs = args.n_epochs
@@ -30,7 +37,11 @@ class GRU4Rec:
         self.item_key = args.item_key
         self.time_key = args.time_key
         self.grad_cap = args.grad_cap
-        self.n_items = args.n_items 
+        self.n_items = args.n_items
+        self.error_during_train = False
+        self.predict = False
+        self.itemidmap = None
+        self.current_session = None
         if args.hidden_act == 'tanh':
             self.hidden_act = self.tanh
         elif args.hidden_act == 'relu':
@@ -74,43 +85,83 @@ class GRU4Rec:
         if self.is_training:
             return
 
-        # use self.predict_state to hold hidden states during prediction. 
-        self.predict_state = [np.zeros([self.batch_size, self.rnn_size], dtype=np.float32) for _ in range(self.layers)]
+        # use self.predict_state to hold hidden states during prediction.
+        self.predict_state = [np.zeros([self.batch_size, self.rnn_size], \
+        dtype=np.float32) for _ in range(self.layers)]
         ckpt = tf.train.get_checkpoint_state(self.checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
             self.saver.restore(sess, '{}/gru-model-{}'.format(self.checkpoint_dir, args.test_model))
 
     ########################ACTIVATION FUNCTIONS#########################
-    def linear(self, X):
-        return X
-    def tanh(self, X):
-        return tf.nn.tanh(X)
-    def softmax(self, X):
-        return tf.nn.softmax(X)
-    def softmaxth(self, X):
-        return tf.nn.softmax(tf.tanh(X))
-    def relu(self, X):
-        return tf.nn.relu(X)
-    def sigmoid(self, X):
-        return tf.nn.sigmoid(X)
+    @classmethod
+    def linear(cls, _x):
+        '''
+        return linear
+        '''
+        return _x
+    @classmethod
+    def tanh(cls, _x):
+        '''
+        return tanh
+        '''
+        return tf.nn.tanh(_x)
+    @classmethod
+    def softmax(cls, _x):
+        '''
+        return softmax
+        '''
+        return tf.nn.softmax(_x)
+    @classmethod
+    def softmaxth(cls, _x):
+        '''
+        return softmaxh
+        '''
+        return tf.nn.softmax(tf.tanh(_x))
+    @classmethod
+    def relu(cls, _x):
+        '''
+        return relu
+        '''
+        return tf.nn.relu(_x)
+    @classmethod
+    def sigmoid(cls, _x):
+        '''
+        return sigmoid
+        '''
+        return tf.nn.sigmoid(_x)
 
     ############################LOSS FUNCTIONS######################
-    def cross_entropy(self, yhat):
+    @classmethod
+    def cross_entropy(cls, yhat):
+        '''
+        return cross-entropy
+        '''
         return tf.reduce_mean(-tf.log(tf.diag_part(yhat)+1e-24))
-    def bpr(self, yhat):
-        yhatT = tf.transpose(yhat)
-        return tf.reduce_mean(-tf.log(tf.nn.sigmoid(tf.diag_part(yhat)-yhatT)))
+    @classmethod
+    def bpr(cls, yhat):
+        '''
+        return bpr
+        '''
+        yhat_t = tf.transpose(yhat)
+        return tf.reduce_mean(-tf.log(tf.nn.sigmoid(tf.diag_part(yhat)-yhat_t)))
     def top1(self, yhat):
-        yhatT = tf.transpose(yhat)
-        term1 = tf.reduce_mean(tf.nn.sigmoid(-tf.diag_part(yhat)+yhatT)+tf.nn.sigmoid(yhatT**2), axis=0)
+        '''
+        return top1
+        '''
+        yhat_t = tf.transpose(yhat)
+        term1 = tf.reduce_mean(tf.nn.sigmoid(-tf.diag_part(yhat)+yhat_t)+ \
+        tf.nn.sigmoid(yhat_t**2), axis=0)
         term2 = tf.nn.sigmoid(tf.diag_part(yhat)**2) / self.batch_size
         return tf.reduce_mean(term1 - term2)
 
     def build_model(self):
-
-        self.X = tf.placeholder(tf.int32, [self.batch_size], name='input')
-        self.Y = tf.placeholder(tf.int32, [self.batch_size], name='output')
-        self.state = [tf.placeholder(tf.float32, [self.batch_size, self.rnn_size], name='rnn_state') for _ in range(self.layers)]
+        '''
+        build model
+        '''
+        self._x = tf.placeholder(tf.int32, [self.batch_size], name='input')
+        self._y = tf.placeholder(tf.int32, [self.batch_size], name='output')
+        self.state = [tf.placeholder(tf.float32, [self.batch_size, \
+        self.rnn_size], name='rnn_state') for _ in range(self.layers)]
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
         with tf.variable_scope('gru_layer'):
@@ -119,70 +170,76 @@ class GRU4Rec:
                 initializer = tf.random_normal_initializer(mean=0, stddev=sigma)
             else:
                 initializer = tf.random_uniform_initializer(minval=-sigma, maxval=sigma)
-            embedding = tf.get_variable('embedding', [self.n_items, self.rnn_size], initializer=initializer)
-            softmax_W = tf.get_variable('softmax_w', [self.n_items, self.rnn_size], initializer=initializer)
-            softmax_b = tf.get_variable('softmax_b', [self.n_items], initializer=tf.constant_initializer(0.0))
+            embedding = tf.get_variable('embedding', [self.n_items, \
+            self.rnn_size], initializer=initializer)
+            softmax_w = tf.get_variable('softmax_w', [self.n_items, \
+            self.rnn_size], initializer=initializer)
+            softmax_b = tf.get_variable('softmax_b', [self.n_items], \
+            initializer=tf.constant_initializer(0.0))
 
             cell = rnn_cell.GRUCell(self.rnn_size, activation=self.hidden_act)
             drop_cell = rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_p_hidden)
             stacked_cell = rnn_cell.MultiRNNCell([drop_cell] * self.layers)
-            
-            inputs = tf.nn.embedding_lookup(embedding, self.X)
+            inputs = tf.nn.embedding_lookup(embedding, self._x)
             output, state = stacked_cell(inputs, tuple(self.state))
             self.final_state = state
 
         if self.is_training:
-            '''
-            Use other examples of the minibatch as negative samples.
-            '''
-            sampled_W = tf.nn.embedding_lookup(softmax_W, self.Y)
-            sampled_b = tf.nn.embedding_lookup(softmax_b, self.Y)
-            logits = tf.matmul(output, sampled_W, transpose_b=True) + sampled_b
+            # Use other examples of the minibatch as negative samples.
+            sampled_w = tf.nn.embedding_lookup(softmax_w, self._y)
+            sampled_b = tf.nn.embedding_lookup(softmax_b, self._y)
+            logits = tf.matmul(output, sampled_w, transpose_b=True) + sampled_b
             self.yhat = self.final_activation(logits)
             self.cost = self.loss_function(self.yhat)
         else:
-            logits = tf.matmul(output, softmax_W, transpose_b=True) + softmax_b
+            logits = tf.matmul(output, softmax_w, transpose_b=True) + softmax_b
             self.yhat = self.final_activation(logits)
 
         if not self.is_training:
             return
 
-        self.lr = tf.maximum(1e-5,tf.train.exponential_decay(self.learning_rate, self.global_step, self.decay_steps, self.decay, staircase=True)) 
-        
-        '''
-        Try different optimizers.
-        '''
-        #optimizer = tf.train.AdagradOptimizer(self.lr)
-        optimizer = tf.train.AdamOptimizer(self.lr)
-        #optimizer = tf.train.AdadeltaOptimizer(self.lr)
-        #optimizer = tf.train.RMSPropOptimizer(self.lr)
+        self._lr = tf.maximum(1e-5, tf.train.exponential_decay(\
+        self.learning_rate, self.global_step, self.decay_steps, \
+        self.decay, staircase=True))
+        #Try different optimizers.
+        #optimizer = tf.train.AdagradOptimizer(self._lr)
+        optimizer = tf.train.AdamOptimizer(self._lr)
+        #optimizer = tf.train.AdadeltaOptimizer(self._lr)
+        #optimizer = tf.train.RMSPropOptimizer(self._lr)
 
         tvars = tf.trainable_variables()
         gvs = optimizer.compute_gradients(self.cost, tvars)
         if self.grad_cap > 0:
             capped_gvs = [(tf.clip_by_norm(grad, self.grad_cap), var) for grad, var in gvs]
         else:
-            capped_gvs = gvs 
+            capped_gvs = gvs
         self.train_op = optimizer.apply_gradients(capped_gvs, global_step=self.global_step)
 
     def init(self, data):
+        '''
+        init model
+        '''
         data.sort_values([self.session_key, self.time_key], inplace=True)
         offset_sessions = np.zeros(data[self.session_key].nunique()+1, dtype=np.int32)
         offset_sessions[1:] = data.groupby(self.session_key).size().cumsum()
         return offset_sessions
-    
     def fit(self, data):
+        '''
+        fit model
+        '''
         output = open('train_results.txt', 'a')
         self.error_during_train = False
         itemids = data[self.item_key].unique()
         self.n_items = len(itemids)
         self.itemidmap = pd.Series(data=np.arange(self.n_items), index=itemids)
-        data = pd.merge(data, pd.DataFrame({self.item_key:itemids, 'ItemIdx':self.itemidmap[itemids].values}), on=self.item_key, how='inner')
+        data = pd.merge(data, pd.DataFrame({self.item_key:itemids, \
+        'ItemIdx':self.itemidmap[itemids].values}), on=self.item_key, how='inner')
         offset_sessions = self.init(data)
-        print('fitting model....\n', file = output)
+        print('fitting model....\n', file=output)
         for epoch in range(self.n_epochs):
             epoch_cost = []
-            state = [np.zeros([self.batch_size, self.rnn_size], dtype=np.float32) for _ in range(self.layers)]
+            state = [np.zeros([self.batch_size, self.rnn_size], \
+            dtype=np.float32) for _ in range(self.layers)]
             session_idx_arr = np.arange(len(offset_sessions)-1)
             iters = np.arange(self.batch_size)
             maxiter = iters.max()
@@ -196,12 +253,12 @@ class GRU4Rec:
                     in_idx = out_idx
                     out_idx = data.ItemIdx.values[start+i+1]
                     # prepare inputs, targeted outputs and hidden states
-                    fetches = [self.cost, self.final_state, self.global_step, self.lr, self.train_op]
-                    feed_dict = {self.X: in_idx, self.Y: out_idx}
-                    for j in range(self.layers): 
+                    fetches = [self.cost, self.final_state, \
+                    self.global_step, self._lr, self.train_op]
+                    feed_dict = {self._x: in_idx, self._y: out_idx}
+                    for j in range(self.layers):
                         feed_dict[self.state[j]] = state[j]
-                    
-                    cost, state, step, lr, _ = self.sess.run(fetches, feed_dict)
+                    cost, state, step, _lr, _ = self.sess.run(fetches, feed_dict)
                     epoch_cost.append(cost)
                     if np.isnan(cost):
                         print(str(epoch) + ':Nan error!')
@@ -209,9 +266,10 @@ class GRU4Rec:
                         return
                     if step == 1 or step % 500 == 0: # self.decay_steps == 0:
                         avgc = np.mean(epoch_cost)
-                        print('Epoch {}\tStep {}\tlr: {:.6f}\tloss: {:.6f}'.format(epoch, step, lr, avgc), file = output)
+                        print('Epoch {}\tStep {}\tlr: {:.6f}\tloss: \
+                        {:.6f}'.format(epoch, step, _lr, avgc), file=output)
                 start = start+minlen-1
-                mask = np.arange(len(iters))[(end-start)<=1]
+                mask = np.arange(len(iters))[(end-start) <= 1]
                 for idx in mask:
                     maxiter += 1
                     if maxiter >= len(offset_sessions)-1:
@@ -220,31 +278,39 @@ class GRU4Rec:
                     iters[idx] = maxiter
                     start[idx] = offset_sessions[session_idx_arr[maxiter]]
                     end[idx] = offset_sessions[session_idx_arr[maxiter]+1]
-                if len(mask) and self.reset_after_session:
+                temp = len(mask)
+                if temp and self.reset_after_session:
                     for i in range(self.layers):
                         state[i][mask] = 0
-            
             avgc = np.mean(epoch_cost)
             if np.isnan(avgc):
-                print('Epoch {}: Nan error!'.format(epoch, avgc))
+                print('Epoch {}: Nan error!'.format(epoch), avgc)
                 self.error_during_train = True
                 return
-            self.saver.save(self.sess, '{}/gru-model'.format(self.checkpoint_dir), global_step=epoch)
+            self.saver.save(self.sess, '{}/gru-model'.format(\
+            self.checkpoint_dir), global_step=epoch)
         output.close()
-    
     def predict_next_batch(self, session_ids, input_item_ids, itemidmap, batch=50):
         '''
-        Gives predicton scores for a selected set of items. Can be used in batch mode to predict for multiple independent events (i.e. events of different sessions) at once and thus speed up evaluation.
+        Gives predicton scores for a selected set of items.
+        Can be used in batch mode to predict for multiple independent events
+        (i.e. events of different sessions) at once and thus speed up evaluation.
 
-        If the session ID at a given coordinate of the session_ids parameter remains the same during subsequent calls of the function, the corresponding hidden state of the network will be kept intact (i.e. that's how one can predict an item to a session).
+        If the session ID at a given coordinate of the session_ids parameter
+        remains the same during subsequent calls of the function, the
+        corresponding hidden state of the network will be kept intact
+        (i.e. that's how one can predict an item to a session).
         If it changes, the hidden state of the network is reset to zeros.
 
         Parameters
         --------
         session_ids : 1D array
-            Contains the session IDs of the events of the batch. Its length must equal to the prediction batch size (batch param).
+            Contains the session IDs of the events of the batch.
+            Its length must equal to the prediction batch size (batch param).
         input_item_ids : 1D array
-            Contains the item IDs of the events of the batch. Every item ID must be must be in the training data of the network. Its length must equal to the prediction batch size (batch param).
+            Contains the item IDs of the events of the batch.
+            Every item ID must be must be in the training data of the network.
+            Its length must equal to the prediction batch size (batch param).
         batch : int
             Prediction batch size.
 
@@ -256,23 +322,22 @@ class GRU4Rec:
 
         '''
         if batch != self.batch_size:
-            raise Exception('Predict batch size({}) must match train batch size({})'.format(batch, self.batch_size))
+            raise Exception('Predict batch size({}) must match \
+            train batch size({})'.format(batch, self.batch_size))
         if not self.predict:
-            self.current_session = np.ones(batch) * -1 
+            self.current_session = np.ones(batch) * -1
             self.predict = True
-        
         session_change = np.arange(batch)[session_ids != self.current_session]
         if len(session_change) > 0: # change internal states with session changes
             for i in range(self.layers):
                 self.predict_state[i][session_change] = 0.0
-            self.current_session=session_ids.copy()
+            self.current_session = session_ids.copy()
 
         in_idxs = itemidmap[input_item_ids]
         fetches = [self.yhat, self.final_state]
-        feed_dict = {self.X: in_idxs}
+        feed_dict = {self._x: in_idxs}
         for i in range(self.layers):
             feed_dict[self.state[i]] = self.predict_state[i]
         preds, self.predict_state = self.sess.run(fetches, feed_dict)
         preds = np.asarray(preds).T
         return pd.DataFrame(data=preds, index=itemidmap.index)
-

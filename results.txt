@@ -1,45 +1,45 @@
-Number of similar users to consider = 15
-Number of movies to recommend = 20
+Number of similar users to consider = 5
+Number of movies to recommend = 5
 
-train set = 69945
-test set = 30055
+train set = 79912
+test set = 20088
 
-total movie number = 1631
+total movie number = 1651
 
-Total similarity factor number = 811712
-
-Evaluation start...
-
-precision=0.3120
-recall=0.1960
-coverage=0.3580
-Number of similar users to consider = 20
-Number of movies to recommend = 20
-
-train set = 69909
-test set = 30091
-
-total movie number = 1625
-
-Total similarity factor number = 807902
+Total similarity factor number = 832882
 
 Evaluation start...
 
-precision=0.3230
-recall=0.2020
+precision=0.2740
+recall=0.0640
 coverage=0.3100
-Number of similar users to consider = 25
-Number of movies to recommend = 20
+Number of similar users to consider = 10
+Number of movies to recommend = 5
 
-train set = 69953
-test set = 30047
+train set = 79957
+test set = 20043
 
-total movie number = 1639
+total movie number = 1649
 
-Total similarity factor number = 808944
+Total similarity factor number = 831804
 
 Evaluation start...
 
-precision=0.3290
-recall=0.2060
-coverage=0.2840
+precision=0.3280
+recall=0.0770
+coverage=0.2300
+Number of similar users to consider = 15
+Number of movies to recommend = 5
+
+train set = 79888
+test set = 20112
+
+total movie number = 1654
+
+Total similarity factor number = 832290
+
+Evaluation start...
+
+precision=0.3570
+recall=0.0840
+coverage=0.1950
