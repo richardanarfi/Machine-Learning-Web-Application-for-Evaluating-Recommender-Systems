@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Feb 27 2017
-Author: Weiping Song
+Original Author: Weiping Song
+Edited/Modified by: Benjamin Kwapong
 """
 import pandas as pd
 import numpy as np
