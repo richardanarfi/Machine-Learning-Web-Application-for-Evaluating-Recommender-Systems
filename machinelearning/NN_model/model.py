@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Feb 26, 2017
-@author: Weiping Song
+Original Author: Weiping Song
+Edited/Modified by: Benjamin Kwapong
 """
 # pylint: disable=no-name-in-module
 import os
