@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Feb 26 2017
-Author: Weiping Song
+Original Author: Weiping Song
+Edited/Modified by: Benjamin Kwapong
 """
 import os
 import argparse
